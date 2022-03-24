@@ -8,24 +8,37 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Lint the Bicep file
+  # Build the application and database
+  build:
+    uses: fwestling-lor/toy-website-environments/.github/workflows/build.yml@main
+
+  # Lint the Bicep file.
   lint:
     uses: fwestling-lor/toy-website-environments/.github/workflows/lint.yml@main
 
+  # Deploy to the test environment.
   deploy-test:
     uses: fwestling-lor/toy-website-environments/.github/workflows/deploy.yml@main
-    needs: lint
+    needs: [build, lint]
     with:
       environmentType: Test
       resourceGroupName: ToyWebsiteTest
+      reviewApiUrl: https://sandbox.contoso.com/reviews
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS_TEST }}
+      reviewApiKey: ${{ secrets.REVIEW_API_KEY_TEST }}
 
+  # Deploy to the production environment.
   deploy-production:
     uses: fwestling-lor/toy-website-environments/.github/workflows/deploy.yml@main
-    needs: deploy-test
+    needs:
+      - lint
+      - build
+      - deploy-test
     with:
       environmentType: Production
       resourceGroupName: ToyWebsiteProduction
+      reviewApiUrl: https://api.contoso.com/reviews
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS_PRODUCTION }}
+      reviewApiKey: ${{ secrets.REVIEW_API_KEY_PRODUCTION }}

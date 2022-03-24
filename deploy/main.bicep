@@ -12,6 +12,13 @@ param environmentType string
 @maxLength(13)
 param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
+@description('The URL to the product review API.')
+param reviewApiUrl string
+
+@secure()
+@description('The API key to use when accessing the product review API.')
+param reviewApiKey string
+
 // Define the names for resources.
 var appServiceAppName = 'toy-website-${resourceNameSuffix}'
 var appServicePlanName = 'toy-website'
@@ -59,6 +66,14 @@ resource appServiceApp 'Microsoft.Web/sites@2021-01-15' = {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsights.properties.ConnectionString
         }
+        {
+          name: 'ReviewApiUrl'
+          value: reviewApiUrl
+        }
+        {
+          name: 'ReviewApiKey'
+          value: reviewApiKey
+        }
       ]
     }
   }
@@ -84,4 +99,5 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   }
 }
 
+output appServiceAppName string = appServiceApp.name
 output appServiceAppHostName string = appServiceApp.properties.defaultHostName

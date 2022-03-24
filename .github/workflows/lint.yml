@@ -1,6 +1,6 @@
 name: lint
 
-on: 
+on:
   workflow_call:
 
 jobs:
@@ -8,8 +8,8 @@ jobs:
     name: Lint code
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    
-    -name: Lint code
-      run: |
-        az bicep build --file deploy/main.bicep
+      - uses: actions/checkout@v2
+
+      - name: Lint code
+        run: |
+          az bicep build --file deploy/main.bicep
